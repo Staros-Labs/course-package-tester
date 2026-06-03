@@ -1,17 +1,35 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import yazl from "yazl";
 import { importZipPackage, normalizeZipEntryName } from "../lib/importer.mjs";
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "course-package-test-"));
 }
 
+function addDirectoryToZip(zip, sourceDir, prefix = "") {
+  for (const name of fs.readdirSync(sourceDir)) {
+    const fullPath = path.join(sourceDir, name);
+    const zipPath = prefix ? `${prefix}/${name}` : name;
+    const stat = fs.statSync(fullPath);
+    if (stat.isDirectory()) addDirectoryToZip(zip, fullPath, zipPath);
+    else zip.addFile(fullPath, zipPath);
+  }
+}
+
 function zipDir(sourceDir, zipPath) {
-  execFileSync("zip", ["-qr", zipPath, "."], { cwd: sourceDir });
+  return new Promise((resolve, reject) => {
+    const zip = new yazl.ZipFile();
+    addDirectoryToZip(zip, sourceDir);
+    zip.outputStream
+      .pipe(fs.createWriteStream(zipPath))
+      .on("close", resolve)
+      .on("error", reject);
+    zip.end();
+  });
 }
 
 test("imports zip and deduplicates by sha256", async () => {
@@ -21,7 +39,7 @@ test("imports zip and deduplicates by sha256", async () => {
   fs.mkdirSync(source, { recursive: true });
   fs.writeFileSync(path.join(source, "index.html"), "<!doctype html><title>Sample</title>");
   const zipPath = path.join(temp, "sample.zip");
-  zipDir(path.join(temp, "source"), zipPath);
+  await zipDir(path.join(temp, "source"), zipPath);
 
   const first = await importZipPackage({ zipPath, originalFilename: "sample.zip", importsRoot });
   const second = await importZipPackage({ zipPath, originalFilename: "renamed.zip", importsRoot });

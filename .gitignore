@@ -4,3 +4,4 @@ dist/
 *.log
 .course-package-tester/
 coverage/
+AGENTS.md
