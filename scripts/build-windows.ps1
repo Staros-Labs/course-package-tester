@@ -30,37 +30,26 @@ if ($SignWithParams) {
   $env:WINDOWS_SIGN_WITH_PARAMS = $SignWithParams
 }
 
-npm install
+npm ci
 npm test
 npm run package:windows
 
 if ($Signed) {
   npm run sign:windows
+  powershell -ExecutionPolicy Bypass -File (Join-Path $ScriptDir "verify-windows-signature.ps1") -RequireValid
 }
 
-if (Test-Path $ZipPath) {
-  Remove-Item $ZipPath -Force
-}
-
-Compress-Archive -Path $AppDir -DestinationPath $ZipPath -Force
-
-$hash = Get-FileHash $ZipPath -Algorithm SHA256
-"$($hash.Hash.ToLowerInvariant())  $(Split-Path -Leaf $ZipPath)" | Set-Content -Path $HashPath -Encoding ascii
+npm run package:windows:zip:existing
 
 Write-Host "Created: $ZipPath"
-Write-Host "SHA256: $($hash.Hash.ToLowerInvariant())"
+if (Test-Path $HashPath) {
+  Write-Host (Get-Content $HashPath)
+}
 
 if (Test-Path $ExePath) {
   $signature = Get-AuthenticodeSignature $ExePath
   Write-Host "Signature status: $($signature.Status)"
   if ($signature.SignerCertificate) {
     Write-Host "Signer: $($signature.SignerCertificate.Subject)"
-  }
-}
-
-if ($Signed -and (Test-Path $ExePath)) {
-  $signature = Get-AuthenticodeSignature $ExePath
-  if ($signature.Status -ne "Valid") {
-    throw "Signed build requested, but Authenticode signature status is $($signature.Status)."
   }
 }
