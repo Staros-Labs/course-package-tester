@@ -10,7 +10,7 @@ Download the latest Windows release from:
 https://github.com/Staros-Labs/course-package-tester/releases/latest
 ```
 
-The current v1.0.1 Windows release is unsigned. Windows may show a publisher or SmartScreen warning.
+The current v1.0.2 Windows release is unsigned. Windows may show a publisher or SmartScreen warning.
 
 1. Extract the full Windows zip.
 2. Open the extracted folder.

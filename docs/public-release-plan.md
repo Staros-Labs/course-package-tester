@@ -6,6 +6,6 @@ The public repository is the canonical product surface. Legacy embedded copies i
 
 ## Current Public Release
 
-v1.0.1 is the current unsigned patch release. It adds dependency updates, manifest parser compatibility for `@xmldom/xmldom` 0.9, agency handoff documentation, and signed-release operations for future Authenticode releases.
+v1.0.2 is the current unsigned patch release. It syncs packaged documentation with the public repository, adds first-run agency feedback prompts, and preserves the v1.0.1 dependency, manifest parser, handoff, and signed-release operations updates.
 
 Windows code signing remains deferred until a certificate or signing provider is available. Release notes and handoff materials must continue to call out unsigned status while that remains true.
