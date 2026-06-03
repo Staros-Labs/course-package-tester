@@ -29,7 +29,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run package:windows:zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: CoursePackageTester-Windows-x64
           path: |
