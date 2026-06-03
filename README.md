@@ -72,6 +72,8 @@ A SHA256 checksum is written next to the zip.
 
 Windows code signing is supported but requires a Staros Labs Authenticode certificate. Unsigned release builds must state that status in the release notes.
 
+See [Windows Code Signing](./docs/code-signing.md) for GitHub Actions secrets, local signing commands, and release-note requirements.
+
 On Windows:
 
 ```powershell

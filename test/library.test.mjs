@@ -19,7 +19,8 @@ test("discovers sample fixture as launchable course", () => {
 });
 
 test("safeJoin rejects traversal", () => {
-  assert.equal(safeJoin("/tmp/base", "../evil"), null);
-  assert.equal(safeJoin("/tmp/base", "/tmp/evil"), null);
-  assert.equal(safeJoin("/tmp/base", "safe/file.txt"), "/tmp/base/safe/file.txt");
+  const base = path.join(path.sep, "tmp", "base");
+  assert.equal(safeJoin(base, "../evil"), null);
+  assert.equal(safeJoin(base, path.join(path.sep, "tmp", "evil")), null);
+  assert.equal(safeJoin(base, "safe/file.txt"), path.resolve(base, "safe", "file.txt"));
 });
