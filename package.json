@@ -25,6 +25,7 @@
   "devDependencies": {
     "@electron/packager": "^18.3.6",
     "@electron/windows-sign": "^1.2.2",
-    "electron": "^42.3.2"
+    "electron": "^42.3.2",
+    "yazl": "^3.3.1"
   }
 }
