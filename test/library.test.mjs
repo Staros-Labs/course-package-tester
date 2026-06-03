@@ -22,5 +22,5 @@ test("safeJoin rejects traversal", () => {
   const base = path.join(path.sep, "tmp", "base");
   assert.equal(safeJoin(base, "../evil"), null);
   assert.equal(safeJoin(base, path.join(path.sep, "tmp", "evil")), null);
-  assert.equal(safeJoin(base, "safe/file.txt"), path.join(base, "safe", "file.txt"));
+  assert.equal(safeJoin(base, "safe/file.txt"), path.resolve(base, "safe", "file.txt"));
 });

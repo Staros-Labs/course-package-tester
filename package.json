@@ -15,7 +15,7 @@
     "package:windows": "electron-packager . \"Course Package Tester\" --platform=win32 --arch=x64 --out=dist/desktop --overwrite --prune=true --ignore=\"^/dist($|/)\" --ignore=\"^/.git($|/)\" --ignore=\"^/.github($|/)\" --executable-name=CoursePackageTester && npm run prepare:windows-handoff",
     "sign:windows": "electron-windows-sign \"dist/desktop/Course Package Tester-win32-x64\" --description=\"Course Package Tester\"",
     "package:windows:signed": "npm run package:windows && npm run sign:windows && npm run package:windows:zip:existing",
-    "package:windows:zip:existing": "cd dist/desktop && find \"Course Package Tester-win32-x64\" -name .DS_Store -delete && rm -f CoursePackageTester_Windows_x64_v$npm_package_version.zip CoursePackageTester_Windows_x64_v$npm_package_version.zip.sha256.txt && zip -qr CoursePackageTester_Windows_x64_v$npm_package_version.zip \"Course Package Tester-win32-x64\" && shasum -a 256 CoursePackageTester_Windows_x64_v$npm_package_version.zip > CoursePackageTester_Windows_x64_v$npm_package_version.zip.sha256.txt",
+    "package:windows:zip:existing": "node scripts/package-windows-zip.mjs",
     "package:windows:zip": "npm run package:windows && npm run package:windows:zip:existing"
   },
   "dependencies": {
