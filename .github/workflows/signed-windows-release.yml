@@ -1,0 +1,49 @@
+name: Signed Windows Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signed-windows:
+    runs-on: windows-latest
+    env:
+      WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+      WINDOWS_SIGN_WITH_PARAMS: ${{ secrets.WINDOWS_SIGN_WITH_PARAMS }}
+      WINDOWS_TIMESTAMP_SERVER: ${{ secrets.WINDOWS_TIMESTAMP_SERVER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run package:windows
+      - name: Configure signing certificate
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+        run: |
+          if (-not $env:WINDOWS_CERTIFICATE_BASE64) {
+            throw "Missing WINDOWS_CERTIFICATE_BASE64 repository secret."
+          }
+          if (-not $env:WINDOWS_CERTIFICATE_PASSWORD) {
+            throw "Missing WINDOWS_CERTIFICATE_PASSWORD repository secret."
+          }
+
+          $certPath = Join-Path $env:RUNNER_TEMP "course-package-tester-signing.pfx"
+          [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64))
+
+          Add-Content -Path $env:GITHUB_ENV -Value "WINDOWS_CERTIFICATE_FILE=$certPath"
+      - run: npm run sign:windows
+      - run: powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-signature.ps1 -RequireValid
+      - run: npm run package:windows:zip:existing
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoursePackageTester-Windows-x64-signed
+          path: |
+            dist/desktop/CoursePackageTester_Windows_x64_v*.zip
+            dist/desktop/CoursePackageTester_Windows_x64_v*.zip.sha256.txt
