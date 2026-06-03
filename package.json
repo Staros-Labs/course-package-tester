@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node server.mjs",
     "desktop": "electron .",
-    "test": "node --test test/*.test.mjs",
+    "test": "node scripts/run-tests.mjs",
     "prepare:windows-handoff": "node scripts/prepare-windows-handoff.mjs",
     "package:windows": "electron-packager . \"Course Package Tester\" --platform=win32 --arch=x64 --out=dist/desktop --overwrite --prune=true --ignore=\"^/dist($|/)\" --ignore=\"^/.git($|/)\" --ignore=\"^/.github($|/)\" --executable-name=CoursePackageTester && npm run prepare:windows-handoff",
     "sign:windows": "electron-windows-sign \"dist/desktop/Course Package Tester-win32-x64\" --description=\"Course Package Tester\"",
