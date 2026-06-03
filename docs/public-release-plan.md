@@ -6,6 +6,6 @@ The public repository is the canonical product surface. Legacy embedded copies i
 
 ## Current Public Release
 
-v1.0.2 is the current unsigned patch release. It syncs packaged documentation with the public repository, adds first-run agency feedback prompts, and preserves the v1.0.1 dependency, manifest parser, handoff, and signed-release operations updates.
+v1.1.0 is the current unsigned minor release. It adds first-run guidance, recent package shortcuts, clearer zip import failure suggestions, and a Feedback Summary export for external review cycles.
 
 Windows code signing remains deferred until a certificate or signing provider is available. Release notes and handoff materials must continue to call out unsigned status while that remains true.

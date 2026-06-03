@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import yazl from "yazl";
-import { importZipPackage, normalizeZipEntryName } from "../lib/importer.mjs";
+import { describeImportError, importZipPackage, normalizeZipEntryName } from "../lib/importer.mjs";
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "course-package-test-"));
@@ -56,4 +56,19 @@ test("rejects zip-slip paths", () => {
   assert.equal(normalizeZipEntryName("C:/evil.txt"), "");
   assert.equal(normalizeZipEntryName("/absolute/evil.txt"), "absolute/evil.txt");
   assert.equal(normalizeZipEntryName("safe/index.html"), "safe/index.html");
+});
+
+test("describes import failures with user-facing suggestions", () => {
+  const missingLaunch = describeImportError(new Error("The zip does not contain an imsmanifest.xml launch target or an index.html file."));
+  assert.equal(missingLaunch.status, 400);
+  assert.equal(missingLaunch.category, "missing-launch-file");
+  assert.match(missingLaunch.suggestion, /imsmanifest\.xml/);
+
+  const unsafe = describeImportError(new Error("Unsafe zip entry path: ../evil.txt"));
+  assert.equal(unsafe.category, "unsafe-zip-path");
+  assert.match(unsafe.suggestion, /Re-export/);
+
+  const fileCount = describeImportError(new Error("Zip contains too many files. Maximum is 5000."));
+  assert.equal(fileCount.status, 413);
+  assert.equal(fileCount.category, "file-count");
 });

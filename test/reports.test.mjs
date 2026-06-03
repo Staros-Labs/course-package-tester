@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDiagnostics, buildTesterReport } from "../lib/reports.mjs";
+import { buildDiagnostics, buildFeedbackSummary, buildTesterReport } from "../lib/reports.mjs";
 
 test("builds tester report payload", () => {
   const report = buildTesterReport({
@@ -29,4 +29,24 @@ test("builds diagnostics payload", () => {
   assert.equal(diagnostics.reportType, "diagnostics");
   assert.equal(diagnostics.lastError, "boom");
   assert.equal(diagnostics.library.courseCount, 1);
+});
+
+test("builds feedback summary payload", () => {
+  const feedback = buildFeedbackSummary({
+    version: "1.1.0",
+    lastError: "import failed",
+    status: {
+      activeCourseId: "sample",
+      activeLaunchPath: "sample/index.html",
+      mode: "mock",
+      library: { root: "/tmp/library", mode: "folders", courseCount: 1 },
+      session: { "cmi.core.lesson_status": "completed" },
+      telemetry: { events: [], totalEvents: 0, history: [] },
+    },
+  });
+  assert.equal(feedback.reportType, "feedback-summary");
+  assert.equal(feedback.testerVersion, "1.1.0");
+  assert.equal(feedback.testerReport.package.activeCourseId, "sample");
+  assert.equal(feedback.diagnostics.lastError, "import failed");
+  assert.ok(feedback.prompts.length >= 4);
 });

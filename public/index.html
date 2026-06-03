@@ -138,6 +138,7 @@
       display: flex;
       gap: 10px;
       margin-top: 12px;
+      flex-wrap: wrap;
     }
     button {
       appearance: none;
@@ -155,6 +156,55 @@
     .secondary {
       background: #eef2f6;
       color: var(--navy);
+    }
+    .notice {
+      border: 1px solid rgba(30, 176, 187, 0.35);
+      border-radius: 12px;
+      background: #f0fbfc;
+      padding: 12px;
+      color: var(--navy);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .notice ol {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+    .notice li {
+      margin: 4px 0;
+    }
+    .recent-list {
+      display: grid;
+      gap: 8px;
+    }
+    .recent-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px 12px;
+      color: var(--ink);
+    }
+    .recent-item strong {
+      display: block;
+      color: var(--navy);
+      font-size: 13px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+    .recent-item span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .empty-state {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
     }
     .status-grid {
       display: grid;
@@ -277,6 +327,26 @@
         </div>
       </div>
 
+      <div class="section" id="firstRunPanel">
+        <label>Getting Started</label>
+        <div class="notice">
+          <strong>Recommended first pass</strong>
+          <ol>
+            <li>Import a zip or choose an unpacked package.</li>
+            <li>Launch in SCORM Mock mode.</li>
+            <li>Export a Tester Report, Diagnostics, or Feedback Summary.</li>
+          </ol>
+          <div class="actions">
+            <button class="secondary" id="dismissHelpBtn">Dismiss</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Recent Packages</label>
+        <div class="recent-list" id="recentList"></div>
+      </div>
+
       <div class="section">
         <label>Launch Mode</label>
         <div class="mode-grid" id="modeGrid"></div>
@@ -312,6 +382,7 @@
           <button class="secondary" id="resetBtn">Reset Log</button>
           <button class="secondary" id="reportBtn">Tester Report</button>
           <button class="secondary" id="diagnosticsBtn">Diagnostics</button>
+          <button class="secondary" id="feedbackBtn">Feedback Summary</button>
         </div>
       </div>
 
@@ -417,9 +488,13 @@
       resetBtn: document.getElementById("resetBtn"),
       reportBtn: document.getElementById("reportBtn"),
       diagnosticsBtn: document.getElementById("diagnosticsBtn"),
+      feedbackBtn: document.getElementById("feedbackBtn"),
       importZipBtn: document.getElementById("importZipBtn"),
       removeImportBtn: document.getElementById("removeImportBtn"),
       zipInput: document.getElementById("zipInput"),
+      firstRunPanel: document.getElementById("firstRunPanel"),
+      dismissHelpBtn: document.getElementById("dismissHelpBtn"),
+      recentList: document.getElementById("recentList"),
       frame: document.getElementById("courseFrame"),
       launchTitle: document.getElementById("launchTitle"),
       launchPath: document.getElementById("launchPath"),
@@ -457,6 +532,8 @@
     let lastLaunchToken = null;
     let activeFrameLaunchToken = null;
     let lastTelemetryBatchState = null;
+    const RECENT_PACKAGES_KEY = "course-package-tester.recent-packages.v1";
+    const FIRST_RUN_HELP_KEY = "course-package-tester.first-run-help.dismissed";
 
     function logLine(message) {
       const timestamp = new Date().toLocaleTimeString();
@@ -467,6 +544,80 @@
     function truncate(value, max = 120) {
       const text = String(value ?? "");
       return text.length > max ? `${text.slice(0, max)}...` : text;
+    }
+
+    function readRecentPackages() {
+      try {
+        const parsed = JSON.parse(window.localStorage.getItem(RECENT_PACKAGES_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function writeRecentPackages(items) {
+      window.localStorage.setItem(RECENT_PACKAGES_KEY, JSON.stringify(items.slice(0, 6)));
+    }
+
+    function rememberCourse(course, action) {
+      if (!course) return;
+      const existing = readRecentPackages().filter((item) => item.launchPath !== course.launchPath);
+      writeRecentPackages([
+        {
+          id: course.id,
+          label: course.label,
+          launchPath: course.launchPath,
+          source: course.source,
+          type: course.type,
+          action,
+          lastUsedAt: new Date().toISOString()
+        },
+        ...existing
+      ]);
+      renderRecentPackages();
+    }
+
+    function renderRecentPackages() {
+      const recents = readRecentPackages()
+        .map((recent) => {
+          const course = courses.find((item) => item.launchPath === recent.launchPath || item.id === recent.id);
+          return course ? { recent, course } : null;
+        })
+        .filter(Boolean)
+        .slice(0, 5);
+
+      dom.recentList.innerHTML = "";
+      if (!recents.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "Recent packages appear after launch or import.";
+        dom.recentList.appendChild(empty);
+        return;
+      }
+
+      recents.forEach(({ recent, course }) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "recent-item";
+        const action = recent.action === "import" ? "Imported" : "Launched";
+        const title = document.createElement("strong");
+        const details = document.createElement("span");
+        title.textContent = course.label;
+        details.textContent = `${action} ${new Date(recent.lastUsedAt).toLocaleString()} - ${course.type || "package"}`;
+        button.append(title, details);
+        button.addEventListener("click", () => {
+          dom.courseSelect.value = course.launchPath;
+          dom.launchTitle.textContent = course.label;
+          dom.launchPath.textContent = `/course/${course.launchPath}`;
+          updateImportActions();
+        });
+        dom.recentList.appendChild(button);
+      });
+    }
+
+    function updateFirstRunHelp() {
+      const dismissed = window.localStorage.getItem(FIRST_RUN_HELP_KEY) === "true";
+      dom.firstRunPanel.style.display = dismissed ? "none" : "";
     }
 
     function updateStatePanel(session = null, connected = false) {
@@ -705,6 +856,7 @@
         dom.courseSelect.appendChild(option);
       });
       updateImportActions();
+      renderRecentPackages();
     }
 
     async function loadCourses() {
@@ -787,6 +939,7 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Launch request failed");
+      rememberCourse(course, "launch");
       return data;
     }
 
@@ -1341,13 +1494,17 @@
           body: file
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Zip import failed");
+        if (!res.ok) {
+          const suggestion = data.suggestion ? `\n${data.suggestion}` : "";
+          throw new Error(`${data.error || "Zip import failed"}${suggestion}`);
+        }
         await loadCourses();
         const imported = courses.find((course) => course.id === data.courseId);
         if (imported) {
           dom.courseSelect.value = imported.launchPath;
           dom.launchTitle.textContent = imported.label;
           dom.launchPath.textContent = `/course/${imported.launchPath}`;
+          rememberCourse(imported, "import");
         }
         updateImportActions();
         logLine(data.duplicate ? `Already imported: ${file.name}` : `Imported ${file.name}`);
@@ -1401,7 +1558,18 @@
       exportJson("/api/export/diagnostics", "Diagnostics");
     });
 
+    dom.feedbackBtn.addEventListener("click", () => {
+      exportJson("/api/export/feedback-summary", "Feedback Summary");
+    });
+
+    dom.dismissHelpBtn.addEventListener("click", () => {
+      window.localStorage.setItem(FIRST_RUN_HELP_KEY, "true");
+      updateFirstRunHelp();
+    });
+
     renderModes();
+    updateFirstRunHelp();
+    renderRecentPackages();
     updateBootPanel(null);
     dom.frame.addEventListener("load", () => {
       const frameUrl = dom.frame.contentWindow && dom.frame.contentWindow.location

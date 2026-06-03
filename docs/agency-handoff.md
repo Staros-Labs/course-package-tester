@@ -23,7 +23,7 @@ https://github.com/Staros-Labs/course-package-tester/releases/latest
 Use the Windows x64 zip asset. After downloading, compare the zip against the published SHA256 checksum on the release page.
 
 Current signature status:
-The v1.0.2 release is unsigned. Windows may show a publisher or SmartScreen warning. Signed releases are deferred until a code-signing certificate is available.
+The v1.1.0 release is unsigned. Windows may show a publisher or SmartScreen warning. Signed releases are deferred until a code-signing certificate is available.
 
 Runtime behavior:
 The app is local-only by design. It starts a local server on 127.0.0.1, opens a desktop browser window, and serves course files selected from the local machine. It does not upload course packages, reports, diagnostics, or usage data.
@@ -33,13 +33,13 @@ Basic use:
 2. Run CoursePackageTester.exe.
 3. Select a folder that contains unpacked course folders, or use Import Zip inside the app.
 4. Launch the course in Standalone or SCORM Mock mode.
-5. Export a Tester Report or diagnostics if you need to share findings.
+5. Export a Tester Report, diagnostics, or Feedback Summary if you need to share findings.
 
 Reference:
 https://github.com/Staros-Labs/course-package-tester/blob/main/WINDOWS_IT_HANDOFF.md
 
 Feedback:
-Please report whether Windows warned on first launch, whether extraction and launch were clear, whether folder selection or zip import failed, and whether the Tester Report had enough detail for troubleshooting.
+Please report whether Windows warned on first launch, whether extraction and launch were clear, whether folder selection or zip import failed, and whether the Tester Report or Feedback Summary had enough detail for troubleshooting.
 ```
 
 ## Before Sending

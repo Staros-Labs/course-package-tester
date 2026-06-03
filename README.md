@@ -13,7 +13,8 @@ It is not a course authoring tool, LMS, SCORM certification tool, hosted LRS, or
 - Prefer SCORM manifest launch targets when `imsmanifest.xml` is available.
 - Fall back to generic `index.html` package launches.
 - Test standalone, SCORM mock, resume, mobile simulation, and local event capture modes.
-- Export local Tester Reports and diagnostics.
+- Export local Tester Reports, diagnostics, and feedback summaries.
+- Keep recent package shortcuts in the local browser profile.
 - Run as a local Node server or packaged Windows desktop app.
 
 ## Requirements
@@ -69,14 +70,14 @@ npm run package:windows:zip
 The current unsigned Windows package is written to:
 
 ```text
-dist/desktop/CoursePackageTester_Windows_x64_v1.0.2.zip
+dist/desktop/CoursePackageTester_Windows_x64_v1.1.0.zip
 ```
 
 A SHA256 checksum is written next to the zip.
 
 ## Signing
 
-Windows code signing is supported but requires a Staros Labs Authenticode certificate. The current v1.0.2 release is unsigned, and release notes state that status.
+Windows code signing is supported but requires a Staros Labs Authenticode certificate. The current v1.1.0 release is unsigned, and release notes state that status.
 
 See [Windows Code Signing](./docs/code-signing.md) for GitHub Actions secrets, local signing commands, and release-note requirements.
 

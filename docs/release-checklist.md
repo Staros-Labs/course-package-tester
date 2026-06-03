@@ -14,4 +14,5 @@
 12. Import a zip package.
 13. Export a Tester Report.
 14. Export diagnostics.
-15. Create the GitHub Release with zip and checksum attached.
+15. Export a Feedback Summary.
+16. Create the GitHub Release with zip and checksum attached.

@@ -3,10 +3,10 @@ import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { importedCourseIdFromDirectory, importZipPackage } from "./lib/importer.mjs";
+import { describeImportError, importedCourseIdFromDirectory, importZipPackage } from "./lib/importer.mjs";
 import { discoverCourses, isDirectory, normalizePath, safeJoin } from "./lib/library.mjs";
 import { normalizeLaunchMode } from "./lib/launch-modes.mjs";
-import { buildDiagnostics, buildTesterReport, writeJsonExport } from "./lib/reports.mjs";
+import { buildDiagnostics, buildFeedbackSummary, buildTesterReport, writeJsonExport } from "./lib/reports.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -298,23 +298,32 @@ function resolveCourseFile(relativePath) {
 }
 
 async function handleZipImport(req, res) {
-  const filename = decodeURIComponent(String(req.headers["x-file-name"] || "package.zip"));
-  const payload = await readBinaryBody(req);
-  if (!payload.length) {
-    sendJson(res, 400, { error: "No zip payload received" });
-    return;
-  }
-
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "course-package-upload-"));
-  const tempZip = path.join(tempDir, "upload.zip");
-  fs.writeFileSync(tempZip, payload);
+  let tempDir = "";
   try {
+    const filename = decodeURIComponent(String(req.headers["x-file-name"] || "package.zip"));
+    const payload = await readBinaryBody(req);
+    if (!payload.length) {
+      sendJson(res, 400, {
+        error: "No zip payload received",
+        category: "empty-upload",
+        suggestion: "Select a non-empty .zip package and try the import again.",
+      });
+      return;
+    }
+
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "course-package-upload-"));
+    const tempZip = path.join(tempDir, "upload.zip");
+    fs.writeFileSync(tempZip, payload);
     const result = await importZipPackage({ zipPath: tempZip, originalFilename: filename, importsRoot });
     refreshCourseList();
     const courseId = importedCourseIdFromDirectory(importsRoot, result.directory);
     sendJson(res, 200, { ok: true, courseId, ...result });
+  } catch (error) {
+    const details = describeImportError(error);
+    lastError = details.error;
+    sendJson(res, details.status, details);
   } finally {
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
   }
 }
 
@@ -382,6 +391,13 @@ const server = http.createServer(async (req, res) => {
       const diagnostics = buildDiagnostics({ status: snapshotStatus(), version: packageInfo.version, lastError });
       const filePath = writeJsonExport({ directory: exportsRoot, prefix: "diagnostics", payload: diagnostics });
       sendJson(res, 200, { ok: true, filePath, diagnostics });
+      return;
+    }
+
+    if (pathname === "/api/export/feedback-summary" && req.method === "POST") {
+      const feedback = buildFeedbackSummary({ status: snapshotStatus(), version: packageInfo.version, lastError });
+      const filePath = writeJsonExport({ directory: exportsRoot, prefix: "feedback-summary", payload: feedback });
+      sendJson(res, 200, { ok: true, filePath, feedback });
       return;
     }
 

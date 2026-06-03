@@ -30,8 +30,9 @@ Use this checklist for the first external review round.
 
 - Could they export a Tester Report?
 - Could they export diagnostics?
+- Could they export a Feedback Summary?
 - Were the exported files safe and useful enough to share?
-- What field or wording was missing from the Tester Report?
+- What field or wording was missing from the Tester Report or Feedback Summary?
 
 ## Follow-Up Data To Request
 
@@ -40,4 +41,4 @@ Use this checklist for the first external review round.
 - Package type: SCORM zip, generic zip, or unpacked folder.
 - Launch mode.
 - Sanitized error text or screenshot.
-- Tester Report or diagnostics when safe to share.
+- Tester Report, diagnostics, or Feedback Summary when safe to share.

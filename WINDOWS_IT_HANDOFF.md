@@ -17,7 +17,7 @@ Expected tester traffic is limited to loopback URLs.
 
 ## Signature Status
 
-The current v1.0.2 release is unsigned. Unsigned builds will show as unsigned in Windows and may trigger SmartScreen or publisher trust warnings.
+The current v1.1.0 release is unsigned. Unsigned builds will show as unsigned in Windows and may trigger SmartScreen or publisher trust warnings.
 
 Signed builds should be verified with:
 
