@@ -23,7 +23,7 @@ https://github.com/Staros-Labs/course-package-tester/releases/latest
 Use the Windows x64 zip asset. After downloading, compare the zip against the published SHA256 checksum on the release page.
 
 Current signature status:
-The v1.0.0 release is unsigned. Windows may show a publisher or SmartScreen warning. Signed releases are planned.
+The v1.0.1 release is unsigned. Windows may show a publisher or SmartScreen warning. Signed releases are deferred until a code-signing certificate is available.
 
 Runtime behavior:
 The app is local-only by design. It starts a local server on 127.0.0.1, opens a desktop browser window, and serves course files selected from the local machine. It does not upload course packages, reports, diagnostics, or usage data.

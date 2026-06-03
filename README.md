@@ -63,7 +63,7 @@ npm run package:windows:zip
 The unsigned Windows package is written to:
 
 ```text
-dist/desktop/CoursePackageTester_Windows_x64_v1.0.0.zip
+dist/desktop/CoursePackageTester_Windows_x64_v1.0.1.zip
 ```
 
 A SHA256 checksum is written next to the zip.

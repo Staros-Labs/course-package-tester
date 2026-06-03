@@ -1,6 +1,6 @@
 {
   "name": "course-package-tester",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "description": "Local preflight tester for SCORM and web course packages.",
