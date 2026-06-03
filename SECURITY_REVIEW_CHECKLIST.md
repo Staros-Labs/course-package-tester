@@ -11,6 +11,7 @@ Use this checklist for IT or security review.
 - Confirm course content has no access to Node APIs or shell privileges.
 - Confirm package content is reviewed separately when outbound controls matter.
 - Confirm the release checksum matches the published SHA256.
+- Confirm unsigned releases are documented as unsigned in release notes and handoff material.
 - Confirm Authenticode signature status when a signed release is provided.
 
 Useful searches:

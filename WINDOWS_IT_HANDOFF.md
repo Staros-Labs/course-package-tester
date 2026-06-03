@@ -17,7 +17,9 @@ Expected tester traffic is limited to loopback URLs.
 
 ## Signature Status
 
-Unsigned builds will show as unsigned in Windows and may trigger SmartScreen or publisher trust warnings. Signed builds should be verified with:
+The current v1.0.1 release is unsigned. Unsigned builds will show as unsigned in Windows and may trigger SmartScreen or publisher trust warnings.
+
+Signed builds should be verified with:
 
 ```powershell
 Get-AuthenticodeSignature ".\Course Package Tester-win32-x64\CoursePackageTester.exe"

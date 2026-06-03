@@ -5,7 +5,7 @@ Thanks for helping improve Course Package Tester.
 ## Local Setup
 
 ```bash
-npm install
+npm ci
 npm test
 npm start
 ```

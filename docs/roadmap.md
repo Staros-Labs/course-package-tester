@@ -2,13 +2,14 @@
 
 Near-term priorities:
 
-- signed Windows releases using the documented Authenticode workflow
+- collect agency install and launch feedback from the unsigned v1.0.1 release
 - zip import hardening
 - better manifest diagnostics
 - Tester Report improvements
+- signed Windows releases using the documented Authenticode workflow after certificate cost is approved
 - additional SCORM and xAPI-style inspection features
 
-See [v1.0.1 Backlog](./v1.0.1-backlog.md) for the immediate patch-release list.
+See [v1.0.1 Release Notes](./v1.0.1-release.md) for the shipped patch-release scope and remaining follow-ups.
 
 Later possibilities:
 

@@ -4,6 +4,14 @@ Course Package Tester lets you review unpacked course folders and imported zip p
 
 ## Windows Desktop App
 
+Download the latest Windows release from:
+
+```text
+https://github.com/Staros-Labs/course-package-tester/releases/latest
+```
+
+The current v1.0.1 Windows release is unsigned. Windows may show a publisher or SmartScreen warning.
+
 1. Extract the full Windows zip.
 2. Open the extracted folder.
 3. Double-click `CoursePackageTester.exe`.

@@ -56,11 +56,17 @@ On first launch, choose the folder that contains unpacked course folders. Import
 
 ## Windows Package
 
+Latest release:
+
+```text
+https://github.com/Staros-Labs/course-package-tester/releases/latest
+```
+
 ```bash
 npm run package:windows:zip
 ```
 
-The unsigned Windows package is written to:
+The current unsigned Windows package is written to:
 
 ```text
 dist/desktop/CoursePackageTester_Windows_x64_v1.0.1.zip
@@ -70,7 +76,7 @@ A SHA256 checksum is written next to the zip.
 
 ## Signing
 
-Windows code signing is supported but requires a Staros Labs Authenticode certificate. Unsigned release builds must state that status in the release notes.
+Windows code signing is supported but requires a Staros Labs Authenticode certificate. The current v1.0.1 release is unsigned, and release notes state that status.
 
 See [Windows Code Signing](./docs/code-signing.md) for GitHub Actions secrets, local signing commands, and release-note requirements.
 
