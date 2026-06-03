@@ -1,0 +1,41 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import test from "node:test";
+import { importZipPackage, normalizeZipEntryName } from "../lib/importer.mjs";
+
+function makeTempDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), "course-package-test-"));
+}
+
+function zipDir(sourceDir, zipPath) {
+  execFileSync("zip", ["-qr", zipPath, "."], { cwd: sourceDir });
+}
+
+test("imports zip and deduplicates by sha256", async () => {
+  const temp = makeTempDir();
+  const source = path.join(temp, "source", "wrapped");
+  const importsRoot = path.join(temp, "imports");
+  fs.mkdirSync(source, { recursive: true });
+  fs.writeFileSync(path.join(source, "index.html"), "<!doctype html><title>Sample</title>");
+  const zipPath = path.join(temp, "sample.zip");
+  zipDir(path.join(temp, "source"), zipPath);
+
+  const first = await importZipPackage({ zipPath, originalFilename: "sample.zip", importsRoot });
+  const second = await importZipPackage({ zipPath, originalFilename: "renamed.zip", importsRoot });
+
+  assert.equal(first.duplicate, false);
+  assert.equal(second.duplicate, true);
+  assert.equal(first.metadata.launchPath, "index.html");
+  assert.equal(fs.existsSync(path.join(first.directory, "index.html")), true);
+});
+
+test("rejects zip-slip paths", () => {
+  assert.equal(normalizeZipEntryName("../evil.txt"), "");
+  assert.equal(normalizeZipEntryName("nested/../../evil.txt"), "");
+  assert.equal(normalizeZipEntryName("C:/evil.txt"), "");
+  assert.equal(normalizeZipEntryName("/absolute/evil.txt"), "absolute/evil.txt");
+  assert.equal(normalizeZipEntryName("safe/index.html"), "safe/index.html");
+});

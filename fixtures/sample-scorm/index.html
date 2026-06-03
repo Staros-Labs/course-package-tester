@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample SCORM Package</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; color: #243044; }
+    main { max-width: 720px; margin: auto; }
+    button { padding: 10px 16px; border: 0; border-radius: 6px; background: #1769aa; color: white; cursor: pointer; }
+    pre { background: #f4f6f8; padding: 12px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Sample SCORM Package</h1>
+    <p>This synthetic package verifies launch, SCORM initialization, score, status, and commit behavior.</p>
+    <button id="complete">Complete Sample</button>
+    <pre id="log"></pre>
+  </main>
+  <script>
+    const log = document.getElementById("log");
+    function write(message) {
+      log.textContent += `${message}\n`;
+    }
+    const api = window.parent && window.parent.API ? window.parent.API : null;
+    if (api) {
+      api.LMSInitialize("");
+      api.LMSSetValue("cmi.core.lesson_status", "incomplete");
+      api.LMSSetValue("cmi.core.lesson_location", "sample-start");
+      api.LMSCommit("");
+      write("SCORM API initialized.");
+    } else {
+      write("No SCORM API detected.");
+    }
+    document.getElementById("complete").addEventListener("click", () => {
+      if (api) {
+        api.LMSSetValue("cmi.core.score.raw", "100");
+        api.LMSSetValue("cmi.core.lesson_status", "completed");
+        api.LMSSetValue("cmi.core.lesson_location", "sample-complete");
+        api.LMSCommit("");
+      }
+      write("Sample completed.");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+name: Package compatibility report
+description: Report a package that behaves differently than expected
+title: "[Package]: "
+labels: ["package-compatibility"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: App version
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+    validations:
+      required: true
+  - type: dropdown
+    id: package_type
+    attributes:
+      label: Package type
+      options:
+        - SCORM zip
+        - generic zip
+        - unpacked folder
+    validations:
+      required: true
+  - type: input
+    id: manifest
+    attributes:
+      label: Manifest status
+      placeholder: present, parsed, missing, or parse error
+  - type: input
+    id: launch_mode
+    attributes:
+      label: Launch mode
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Behavior details
+      description: Include expected vs actual behavior and whether a sanitized sample can be shared.
+    validations:
+      required: true

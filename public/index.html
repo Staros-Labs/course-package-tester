@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Package Tester</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f5f8;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d8dee8;
+      --teal: #1eb0bb;
+      --navy: #374166;
+      --gold: #ffcc00;
+      --green: #2db87a;
+      --red: #e05252;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(30, 176, 187, 0.15), transparent 28%),
+        linear-gradient(180deg, #eef4f8, var(--bg));
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      min-height: 100vh;
+      gap: 18px;
+      padding: 18px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(55, 65, 102, 0.08);
+      overflow: hidden;
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .head {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, var(--navy), #4a567f);
+      color: #fff;
+    }
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.72);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+    .head p {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.82);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .section {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .section:last-child { border-bottom: 0; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    select, textarea, input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .mode-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .mode-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+      background: #fff;
+    }
+    .mode-card.active {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(30,176,187,0.14);
+      transform: translateY(-1px);
+    }
+    .mode-card strong {
+      display: block;
+      font-size: 14px;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .mode-card span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .primary {
+      background: var(--teal);
+      color: #fff;
+    }
+    .secondary {
+      background: #eef2f6;
+      color: var(--navy);
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fcfdff;
+    }
+    .stat .k {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 5px;
+    }
+    .stat .v {
+      display: block;
+      font-size: 13px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+    .log {
+      background: #0f1728;
+      color: #dce7ff;
+      border-radius: 12px;
+      min-height: 240px;
+      max-height: 240px;
+      overflow: auto;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .main {
+      display: flex;
+      flex-direction: column;
+      align-self: start;
+      min-height: 0;
+    }
+    .main-top {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #fffdf6;
+    }
+    .launch-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .launch-meta strong {
+      font-size: 15px;
+      color: var(--navy);
+    }
+    .launch-meta span {
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .badge {
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 204, 0, 0.22);
+      color: #7a5b00;
+    }
+    .frame-wrap {
+      background: #d7dde8;
+      padding: 14px;
+      min-height: 0;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      overflow: auto;
+    }
+    iframe {
+      width: 100%;
+      max-width: 1480px;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      min-height: 0;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(55,65,102,0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel sidebar">
+      <div class="head">
+        <div class="eyebrow">Local Verification</div>
+        <h1>Course Package Tester</h1>
+        <p>Launch a course in standalone, SCORM mock, resume, mobile simulation, or local event capture modes and inspect local runtime, tracking, and package behavior.</p>
+      </div>
+
+      <div class="section">
+        <label for="courseSelect">Course</label>
+        <select id="courseSelect"></select>
+        <div class="actions">
+          <input id="zipInput" type="file" accept=".zip,application/zip" style="display:none">
+          <button class="secondary" id="importZipBtn">Import Zip</button>
+          <button class="secondary" id="removeImportBtn">Remove Import</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Launch Mode</label>
+        <div class="mode-grid" id="modeGrid"></div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <div>
+            <label for="studentName">Student Name</label>
+            <input id="studentName" value="Tester, Pat">
+          </div>
+          <div>
+            <label for="lessonStatus">Preset Status</label>
+            <input id="lessonStatus" value="not attempted">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <div>
+            <label for="lessonLocation">Preset Location</label>
+            <input id="lessonLocation" value="">
+          </div>
+          <div>
+            <label for="rawScore">Preset Raw Score</label>
+            <input id="rawScore" value="">
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <label for="suspendData">Preset Suspend Data</label>
+          <textarea id="suspendData">{}</textarea>
+        </div>
+        <div class="actions">
+          <button class="primary" id="launchBtn">Launch Course</button>
+          <button class="secondary" id="resetBtn">Reset Log</button>
+          <button class="secondary" id="reportBtn">Tester Report</button>
+          <button class="secondary" id="diagnosticsBtn">Diagnostics</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Live LMS State</label>
+        <div class="status-grid">
+          <div class="stat"><span class="k">Connected</span><span class="v" id="stateConnected">No</span></div>
+          <div class="stat"><span class="k">Lesson Status</span><span class="v" id="stateStatus">-</span></div>
+          <div class="stat"><span class="k">Lesson Location</span><span class="v" id="stateLocation">-</span></div>
+          <div class="stat"><span class="k">Student Name</span><span class="v" id="stateStudent">-</span></div>
+          <div class="stat"><span class="k">Score Raw</span><span class="v" id="stateScore">-</span></div>
+          <div class="stat"><span class="k">Suspend Data</span><span class="v" id="stateSuspend">-</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Shared Boot State</label>
+        <div class="status-grid">
+          <div class="stat"><span class="k">Desktop Gate</span><span class="v" id="bootDesktopGate">-</span></div>
+          <div class="stat"><span class="k">Runtime</span><span class="v" id="bootRuntime">-</span></div>
+          <div class="stat"><span class="k">Tracking</span><span class="v" id="bootTracking">-</span></div>
+          <div class="stat"><span class="k">Telemetry</span><span class="v" id="bootTelemetry">-</span></div>
+          <div class="stat"><span class="k">Tracking Type</span><span class="v" id="bootTrackingType">-</span></div>
+          <div class="stat"><span class="k">Transport</span><span class="v" id="bootTransport">-</span></div>
+          <div class="stat"><span class="k">Tracking Config</span><span class="v" id="bootTrackingConfig">-</span></div>
+          <div class="stat"><span class="k">Last Statement</span><span class="v" id="bootLastStatement">-</span></div>
+          <div class="stat"><span class="k">Statement Count</span><span class="v" id="bootStatementCount">-</span></div>
+          <div class="stat"><span class="k">State Summary</span><span class="v" id="bootStateSummary">-</span></div>
+        </div>
+      </div>
+
+      <div class="section" style="min-height:0; display:flex; flex-direction:column;">
+        <label>SCORM API Call Log</label>
+        <div class="log" id="log"></div>
+      </div>
+
+      <div class="section" style="min-height:0; display:flex; flex-direction:column;">
+        <label>Local Event Capture</label>
+        <div class="status-grid" style="margin-bottom:10px;">
+          <div class="stat"><span class="k">Batch Time</span><span class="v" id="telemetryBatchTime">-</span></div>
+          <div class="stat"><span class="k">Batch Events</span><span class="v" id="telemetryBatchCount">0</span></div>
+          <div class="stat"><span class="k">Total Received</span><span class="v" id="telemetryTotalCount">0</span></div>
+          <div class="stat"><span class="k">Recent Batches</span><span class="v" id="telemetryHistoryCount">0</span></div>
+          <div class="stat"><span class="k">Origin</span><span class="v" id="telemetryBatchOrigin">-</span></div>
+          <div class="stat"><span class="k">Course Header</span><span class="v" id="telemetryBatchCourse">-</span></div>
+        </div>
+        <div class="log" id="telemetryBatchLog"></div>
+      </div>
+    </aside>
+
+    <main class="panel main">
+      <div class="main-top">
+        <div class="launch-meta">
+          <strong id="launchTitle">No course loaded</strong>
+          <span id="launchPath">Select a course and launch it in the tester.</span>
+        </div>
+        <div class="badge" id="launchModeBadge">Idle</div>
+      </div>
+      <div class="frame-wrap">
+        <iframe id="courseFrame" title="course package preview"></iframe>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const MODES = [
+      {
+        id: "standalone",
+        label: "Standalone",
+        description: "No parent LMS API. Course should fall back gracefully."
+      },
+      {
+        id: "mock",
+        label: "SCORM Mock",
+        description: "Parent window exposes a SCORM 1.2 API mock with blank session state."
+      },
+      {
+        id: "resume",
+        label: "Resume Session",
+        description: "Parent window exposes a SCORM 1.2 API mock with preloaded status, location, score, and suspend_data."
+      },
+      {
+        id: "mobile-simulation",
+        label: "Mobile Simulation",
+        description: "Simulates a phone/tablet launch context for packages with responsive or restricted mobile behavior."
+      },
+      {
+        id: "local-events",
+        label: "Local Events",
+        description: "Enables local event capture for packages that post runtime batches to the tester."
+      }
+    ];
+
+    const dom = {
+      courseSelect: document.getElementById("courseSelect"),
+      modeGrid: document.getElementById("modeGrid"),
+      studentName: document.getElementById("studentName"),
+      lessonStatus: document.getElementById("lessonStatus"),
+      lessonLocation: document.getElementById("lessonLocation"),
+      rawScore: document.getElementById("rawScore"),
+      suspendData: document.getElementById("suspendData"),
+      launchBtn: document.getElementById("launchBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      reportBtn: document.getElementById("reportBtn"),
+      diagnosticsBtn: document.getElementById("diagnosticsBtn"),
+      importZipBtn: document.getElementById("importZipBtn"),
+      removeImportBtn: document.getElementById("removeImportBtn"),
+      zipInput: document.getElementById("zipInput"),
+      frame: document.getElementById("courseFrame"),
+      launchTitle: document.getElementById("launchTitle"),
+      launchPath: document.getElementById("launchPath"),
+      launchModeBadge: document.getElementById("launchModeBadge"),
+      stateConnected: document.getElementById("stateConnected"),
+      stateStatus: document.getElementById("stateStatus"),
+      stateLocation: document.getElementById("stateLocation"),
+      stateStudent: document.getElementById("stateStudent"),
+      stateScore: document.getElementById("stateScore"),
+      stateSuspend: document.getElementById("stateSuspend"),
+      bootDesktopGate: document.getElementById("bootDesktopGate"),
+      bootRuntime: document.getElementById("bootRuntime"),
+      bootTracking: document.getElementById("bootTracking"),
+      bootTelemetry: document.getElementById("bootTelemetry"),
+      bootTrackingType: document.getElementById("bootTrackingType"),
+      bootTransport: document.getElementById("bootTransport"),
+      bootTrackingConfig: document.getElementById("bootTrackingConfig"),
+      bootLastStatement: document.getElementById("bootLastStatement"),
+      bootStatementCount: document.getElementById("bootStatementCount"),
+      bootStateSummary: document.getElementById("bootStateSummary"),
+      log: document.getElementById("log"),
+      telemetryBatchTime: document.getElementById("telemetryBatchTime"),
+      telemetryBatchCount: document.getElementById("telemetryBatchCount"),
+      telemetryTotalCount: document.getElementById("telemetryTotalCount"),
+      telemetryHistoryCount: document.getElementById("telemetryHistoryCount"),
+      telemetryBatchOrigin: document.getElementById("telemetryBatchOrigin"),
+      telemetryBatchCourse: document.getElementById("telemetryBatchCourse"),
+      telemetryBatchLog: document.getElementById("telemetryBatchLog")
+    };
+
+    let courses = [];
+    let currentMode = "mock";
+    let API = undefined;
+    let syncTimer = null;
+    let lastLaunchToken = null;
+    let activeFrameLaunchToken = null;
+    let lastTelemetryBatchState = null;
+
+    function logLine(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      dom.log.textContent += `[${timestamp}] ${message}\n`;
+      dom.log.scrollTop = dom.log.scrollHeight;
+    }
+
+    function truncate(value, max = 120) {
+      const text = String(value ?? "");
+      return text.length > max ? `${text.slice(0, max)}...` : text;
+    }
+
+    function updateStatePanel(session = null, connected = false) {
+      dom.stateConnected.textContent = connected ? "Yes" : "No";
+      dom.stateStatus.textContent = session ? session["cmi.core.lesson_status"] || "-" : "-";
+      dom.stateLocation.textContent = session ? session["cmi.core.lesson_location"] || "-" : "-";
+      dom.stateStudent.textContent = session ? session["cmi.core.student_name"] || "-" : "-";
+      dom.stateScore.textContent = session ? session["cmi.core.score.raw"] || "-" : "-";
+      dom.stateSuspend.textContent = session ? truncate(session["cmi.suspend_data"] || "") || "-" : "-";
+    }
+
+    function updateBootPanel(boot = null) {
+      const desktopGate = boot && boot.desktopGate ? boot.desktopGate : null;
+      const runtime = boot && boot.runtime ? boot.runtime : null;
+      const tracking = boot && boot.tracking ? boot.tracking : null;
+      const telemetry = boot && boot.telemetry ? boot.telemetry : null;
+      const state = boot && boot.state ? boot.state : null;
+      const trackingConfig = boot && boot.trackingConfig ? boot.trackingConfig : null;
+
+      dom.bootDesktopGate.textContent = desktopGate
+        ? `${desktopGate.checked ? "checked" : "unchecked"} / ${desktopGate.allowed ? "allowed" : "blocked"}${desktopGate.reason ? ` (${desktopGate.reason})` : ""}`
+        : "-";
+      dom.bootRuntime.textContent = runtime
+        ? `bootstrapped=${!!runtime.bootstrapped}, started=${!!runtime.started}, review=${!!runtime.reviewMode}`
+        : "-";
+      dom.bootTracking.textContent = tracking
+        ? `ready=${!!tracking.ready}, compat=${!!tracking.compatibilityAttached}, pending=${tracking.pendingSendCount || 0}`
+        : "-";
+      dom.bootTelemetry.textContent = telemetry
+        ? `enabled=${!!telemetry.enabled}, queued=${telemetry.queuedCount || 0}, sent=${telemetry.sentCount || 0}${telemetry.lastError ? `, error=${telemetry.lastError}` : ""}`
+        : "-";
+      dom.bootTrackingType.textContent = tracking ? tracking.type || "-" : "-";
+      dom.bootTransport.textContent = tracking && tracking.transport
+        ? `${tracking.transport.name || "-"} (${tracking.transport.flushedCount || 0} flushed)`
+        : "-";
+      dom.bootTrackingConfig.textContent = trackingConfig
+        ? `kind=${trackingConfig.transportKind || "-"}, endpoint=${trackingConfig.endpoint ? "set" : "unset"}, bearer=${trackingConfig.hasBearerToken ? "yes" : "no"}, basic=${trackingConfig.hasBasicToken ? "yes" : "no"}`
+        : "-";
+      dom.bootLastStatement.textContent = tracking && tracking.lastStatement
+        ? truncate(`${tracking.lastStatement.eventName || tracking.lastStatement.verb && tracking.lastStatement.verb.display && tracking.lastStatement.verb.display["en-US"] || "-"} ${tracking.lastStatement.activityId || ""}`.trim() || "-")
+        : "-";
+      dom.bootStatementCount.textContent = tracking && Array.isArray(tracking.statements)
+        ? String(tracking.statements.length)
+        : "0";
+      dom.bootStateSummary.textContent = state
+        ? truncate(
+            [
+              state.summary || `restored=${!!state.restored}`,
+              tracking && tracking.lastSendOutcome && tracking.lastSendOutcome.ok === false
+                ? `sendError=${tracking.lastSendOutcome.note || "unknown"}`
+                : "",
+              tracking && tracking.lastFlushOutcome && tracking.lastFlushOutcome.flushed === false && tracking.lastFlushOutcome.note
+                ? `flushError=${tracking.lastFlushOutcome.note}`
+                : ""
+            ].filter(Boolean).join(" | ")
+          )
+        : "-";
+    }
+
+    function updateTelemetryBatchPanel(telemetry = null) {
+      lastTelemetryBatchState = telemetry;
+      const events = telemetry && Array.isArray(telemetry.events) ? telemetry.events : [];
+      const headers = telemetry && telemetry.lastHeaders ? telemetry.lastHeaders : {};
+      dom.telemetryBatchTime.textContent = telemetry && telemetry.lastBatchAt ? telemetry.lastBatchAt : "-";
+      dom.telemetryBatchCount.textContent = String(events.length);
+      dom.telemetryTotalCount.textContent = String(telemetry && telemetry.totalEvents ? telemetry.totalEvents : 0);
+      dom.telemetryHistoryCount.textContent = String(telemetry && Array.isArray(telemetry.history) ? telemetry.history.length : 0);
+      dom.telemetryBatchOrigin.textContent = headers.origin || "-";
+      dom.telemetryBatchCourse.textContent = headers.telemetryCourse || "-";
+      dom.telemetryBatchLog.textContent = events.length
+        ? events.map((item) => {
+            const stamp = item.occurred_at ? `[${item.occurred_at}] ` : "";
+            const learner = item.learner_name || item.learner_id || "-";
+            const eventName = item.event_name || "-";
+            const location = item.lesson_location || item.slide_id || item.module_id || "-";
+            return `${stamp}${learner} -> ${eventName} -> ${location}`;
+          }).join("\n")
+        : "";
+    }
+
+    function buildSession(mode) {
+      const session = {
+        "cmi.core.student_name": dom.studentName.value.trim(),
+        "cmi.core.lesson_status": mode === "resume" ? dom.lessonStatus.value.trim() : "not attempted",
+        "cmi.core.lesson_location": mode === "resume" ? dom.lessonLocation.value : "",
+        "cmi.core.score.raw": mode === "resume" ? dom.rawScore.value : "",
+        "cmi.core.score.min": "0",
+        "cmi.core.score.max": "100",
+        "cmi.suspend_data": ""
+      };
+
+      if (mode === "resume") {
+        try {
+          const parsed = JSON.parse(dom.suspendData.value || "{}");
+          session["cmi.suspend_data"] = JSON.stringify(parsed);
+        } catch (err) {
+          throw new Error(`Invalid suspend_data JSON: ${err.message}`);
+        }
+      }
+
+      window.__SCORM_TESTER_SESSION = session;
+      return session;
+    }
+
+    function deviceContextForMode(mode) {
+      if (mode === "mobile-simulation") {
+        return {
+          forceBlocked: true,
+          reason: "tester-simulated-mobile-device",
+          userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+        };
+      }
+      return null;
+    }
+
+    function installMockApi(mode, preset = null) {
+      if (preset) {
+        dom.studentName.value = preset.studentName ?? dom.studentName.value;
+        dom.lessonStatus.value = preset.lessonStatus ?? dom.lessonStatus.value;
+        dom.lessonLocation.value = preset.lessonLocation ?? dom.lessonLocation.value;
+        dom.rawScore.value = preset.rawScore ?? dom.rawScore.value;
+        dom.suspendData.value = typeof preset.suspendData === "string"
+          ? preset.suspendData
+          : JSON.stringify(preset.suspendData ?? {}, null, 2);
+      }
+
+      window.__SCORM_TESTER_TELEMETRY_CONFIG = {
+        endpoint: `${window.location.protocol}//127.0.0.1:${window.location.port}/api/telemetry/batch`,
+        learnerName: dom.studentName.value.trim(),
+        learnerId: dom.studentName.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+        audienceTrack: "internal",
+        enabled: true,
+        batchSize: 20,
+      };
+      window.__SCORM_TESTER_STUDENT_NAME = dom.studentName.value.trim();
+
+      if (mode === "standalone" || mode === "mobile-simulation") {
+        window.API = undefined;
+        window.__SCORM_TESTER_SESSION = {};
+        window.__INTERNAL_DEVICE_CONTEXT = deviceContextForMode(mode);
+        API = undefined;
+        updateStatePanel(null, false);
+        updateBootPanel({
+          desktopGate: mode === "mobile-simulation"
+            ? { checked: true, allowed: false, reason: "tester-simulated-mobile-device" }
+            : { checked: false, allowed: true, reason: "" },
+          runtime: { bootstrapped: false, started: false, reviewMode: false },
+          tracking: {
+            type: mode === "standalone" ? "standalone" : "scorm",
+            ready: false,
+            compatibilityAttached: false,
+            transport: null,
+            lastStatement: null,
+            statements: []
+          },
+          trackingConfig: null,
+          state: { restored: false, summary: "" }
+        });
+        logLine(mode === "mobile-simulation"
+          ? "Mobile Simulation mode: simulated phone/tablet device context enabled."
+          : "Standalone mode: parent API disabled.");
+        return;
+      }
+
+      const session = buildSession(mode);
+      window.__INTERNAL_DEVICE_CONTEXT = deviceContextForMode(mode);
+      let initialized = false;
+
+      API = {
+        LMSInitialize(arg) {
+          initialized = true;
+          logLine(`LMSInitialize(${JSON.stringify(arg)})`);
+          updateStatePanel(session, true);
+          return "true";
+        },
+        LMSFinish(arg) {
+          logLine(`LMSFinish(${JSON.stringify(arg)})`);
+          updateStatePanel(session, true);
+          return "true";
+        },
+        LMSGetValue(key) {
+          const value = session[key] ?? "";
+          logLine(`LMSGetValue(${JSON.stringify(key)}) -> ${JSON.stringify(value)}`);
+          return value;
+        },
+        LMSSetValue(key, value) {
+          session[key] = String(value);
+          logLine(`LMSSetValue(${JSON.stringify(key)}, ${JSON.stringify(String(value))})`);
+          updateStatePanel(session, true);
+          return "true";
+        },
+        LMSCommit(arg) {
+          logLine(`LMSCommit(${JSON.stringify(arg)})`);
+          updateStatePanel(session, true);
+          return "true";
+        },
+        LMSGetLastError() {
+          return "0";
+        },
+        LMSGetErrorString(code) {
+          return code === "0" ? "No error" : "Unknown error";
+        },
+        LMSGetDiagnostic(code) {
+          return code === "0" ? "No diagnostic" : "Unknown diagnostic";
+        }
+      };
+
+      window.API = API;
+      logLine(`${mode === "resume" ? "Resume" : "Mock LMS"} mode: parent API enabled.`);
+      if (!initialized) updateStatePanel(session, true);
+    }
+
+    function renderModes() {
+      dom.modeGrid.innerHTML = "";
+      MODES.forEach((mode) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `mode-card${mode.id === currentMode ? " active" : ""}`;
+        card.innerHTML = `<strong>${mode.label}</strong><span>${mode.description}</span>`;
+        card.addEventListener("click", () => {
+          currentMode = mode.id;
+          renderModes();
+          dom.launchModeBadge.textContent = mode.label;
+        });
+        dom.modeGrid.appendChild(card);
+      });
+      dom.launchModeBadge.textContent = MODES.find((mode) => mode.id === currentMode).label;
+    }
+
+    function populateCourses() {
+      dom.courseSelect.innerHTML = "";
+      courses.forEach((course) => {
+        const option = document.createElement("option");
+        option.value = course.launchPath;
+        option.textContent = course.source === "import" ? `[Imported] ${course.label}` : course.label;
+        dom.courseSelect.appendChild(option);
+      });
+      updateImportActions();
+    }
+
+    async function loadCourses() {
+      const res = await fetch("/api/courses");
+      const data = await res.json();
+      courses = data.courses || [];
+      populateCourses();
+      if (courses[0]) {
+        dom.launchTitle.textContent = courses[0].label;
+        dom.launchPath.textContent = `/course/${courses[0].launchPath}`;
+      }
+      updateImportActions();
+    }
+
+    function selectedCourse() {
+      return courses.find((course) => course.launchPath === dom.courseSelect.value) || null;
+    }
+
+    function updateImportActions() {
+      const course = selectedCourse();
+      dom.removeImportBtn.disabled = !(course && course.source === "import");
+    }
+
+    function clearHarnessUiForLaunch() {
+      updateStatePanel(null, false);
+      updateBootPanel(null);
+    }
+
+    function launchCourse(options = {}) {
+      const course = options.course || selectedCourse();
+      if (!course) return;
+
+      dom.log.textContent = "";
+      installMockApi(currentMode, options.preset || null);
+      clearHarnessUiForLaunch();
+
+      const params = new URLSearchParams();
+      const launchKey = options.launchKey || String(Date.now());
+      params.set("launchMode", currentMode);
+      params.set("launchKey", launchKey);
+      const src = `/course/${course.launchPath}?${params.toString()}`;
+      activeFrameLaunchToken = launchKey;
+      dom.launchTitle.textContent = course.label;
+      dom.launchPath.textContent = src;
+      dom.launchModeBadge.textContent = MODES.find((mode) => mode.id === currentMode).label;
+
+      logLine(`Launching ${course.label} at ${src}`);
+      dom.frame.src = "about:blank";
+      window.setTimeout(() => {
+        if (activeFrameLaunchToken !== launchKey) return;
+        dom.frame.src = src;
+      }, 20);
+      window.setTimeout(() => {
+        if (activeFrameLaunchToken !== launchKey) return;
+        const currentUrl = dom.frame.contentWindow && dom.frame.contentWindow.location
+          ? dom.frame.contentWindow.location.href || ""
+          : "";
+        if (!currentUrl.includes(`launchKey=${launchKey}`)) {
+          dom.frame.src = src;
+        }
+      }, 180);
+    }
+
+    async function requestLaunchFromServer() {
+      const course = selectedCourse();
+      if (!course) return;
+      const payload = {
+        courseId: course.id,
+        mode: currentMode,
+        studentName: dom.studentName.value.trim(),
+        lessonStatus: dom.lessonStatus.value.trim(),
+        lessonLocation: dom.lessonLocation.value,
+        rawScore: dom.rawScore.value,
+        suspendData: dom.suspendData.value
+      };
+      const res = await fetch("/api/launch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Launch request failed");
+      return data;
+    }
+
+    function collectFrameSnapshot() {
+      try {
+        const frameWindow = dom.frame.contentWindow;
+        const frameDoc = frameWindow && frameWindow.document;
+        const boot = frameWindow && frameWindow.__INTERNAL_COURSE_BOOT_STATUS
+          ? frameWindow.__INTERNAL_COURSE_BOOT_STATUS
+          : null;
+        if (!frameDoc || !frameDoc.body) {
+          return {
+            title: "",
+            url: frameWindow && frameWindow.location ? frameWindow.location.href || "" : "",
+            ready: false,
+            textPreview: "",
+            controls: [],
+            error: "Frame document unavailable",
+            boot
+          };
+        }
+
+        const controls = Array.from(frameDoc.querySelectorAll("button, a, input, select, textarea"))
+          .slice(0, 40)
+          .map((el, index) => ({
+            index,
+            tag: el.tagName.toLowerCase(),
+            text: (el.innerText || el.value || el.getAttribute("aria-label") || "").trim().slice(0, 120),
+            id: el.id || "",
+            className: typeof el.className === "string" ? el.className.slice(0, 120) : "",
+            disabled: !!el.disabled
+          }));
+
+        return {
+          title: frameDoc.title || "",
+          url: frameWindow.location.href || "",
+          ready: true,
+          textPreview: ((frameDoc.body.innerText || frameDoc.body.textContent || "")).replace(/\s+/g, " ").trim().slice(0, 1000),
+          controls,
+          error: null,
+          boot
+        };
+      } catch (err) {
+        return {
+          title: "",
+          url: "",
+          ready: false,
+          textPreview: "",
+          controls: [],
+          error: err.message,
+          boot: null
+        };
+      }
+    }
+
+    function buildKeyboardEventInit(keyCombo) {
+      const parts = String(keyCombo || "").split("+").map((part) => part.trim()).filter(Boolean);
+      const eventInit = {
+        key: "",
+        code: "",
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ctrlKey: false,
+        altKey: false,
+        shiftKey: false,
+        metaKey: false
+      };
+
+      parts.forEach((part) => {
+        const token = part.toLowerCase();
+        if (token === "ctrl" || token === "control") {
+          eventInit.ctrlKey = true;
+        } else if (token === "alt" || token === "option") {
+          eventInit.altKey = true;
+        } else if (token === "shift") {
+          eventInit.shiftKey = true;
+        } else if (token === "meta" || token === "cmd" || token === "command") {
+          eventInit.metaKey = true;
+        } else {
+          eventInit.key = part.length === 1 ? part : part;
+          if (part.length === 1) {
+            eventInit.code = `Key${part.toUpperCase()}`;
+          }
+        }
+      });
+
+      if (!eventInit.key && parts.length > 0) {
+        eventInit.key = parts[parts.length - 1];
+      }
+
+      if (!eventInit.code && eventInit.key && eventInit.key.length === 1) {
+        eventInit.code = `Key${eventInit.key.toUpperCase()}`;
+      }
+
+      return eventInit;
+    }
+
+    function isTestingBypassShortcut(event) {
+      const key = String((event && event.key) || "").toLowerCase();
+      return !!(event && event.ctrlKey && event.altKey && (event.code === "KeyK" || key === "k"));
+    }
+
+    function relayPhysicalBypassShortcut(event) {
+      if (!isTestingBypassShortcut(event)) return;
+
+      const frameDoc = dom.frame.contentWindow && dom.frame.contentWindow.document;
+      if (!frameDoc || !frameDoc.body) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const eventInit = buildKeyboardEventInit("ctrl+alt+k");
+      frameDoc.dispatchEvent(new KeyboardEvent("keydown", eventInit));
+      logLine("Relayed physical Ctrl+Alt+K into the course frame.");
+    }
+
+    function cloneJsonSafe(value) {
+      if (value === null || typeof value === "undefined") return null;
+      try {
+        return JSON.parse(JSON.stringify(value));
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function summarizeStatement(statement) {
+      if (!statement || typeof statement !== "object") return null;
+      return {
+        id: statement.id || "",
+        timestamp: statement.timestamp || "",
+        actor: cloneJsonSafe(statement.actor) || undefined,
+        verb: cloneJsonSafe(statement.verb) || undefined,
+        object: cloneJsonSafe(statement.object) || undefined,
+        result: cloneJsonSafe(statement.result) || undefined,
+        context: cloneJsonSafe(statement.context) || undefined,
+        eventName: statement.eventName || "",
+        activityId: statement.activityId || ""
+      };
+    }
+
+    function summarizeSendOutcome(value) {
+      if (!value || typeof value !== "object") return null;
+      return {
+        ok: typeof value.ok === "boolean" ? value.ok : undefined,
+        transport: value.transport || "",
+        statementId: value.statementId || "",
+        note: value.note || "",
+        status: typeof value.status === "number" ? value.status : undefined,
+        flushedCount: typeof value.flushedCount === "number" ? value.flushedCount : undefined
+      };
+    }
+
+    function sanitizeTrackingState(tracking) {
+      if (!tracking || typeof tracking !== "object") return null;
+      return {
+        type: tracking.type || "",
+        ready: !!tracking.ready,
+        compatibilityAttached: !!tracking.compatibilityAttached,
+        transport: cloneJsonSafe(tracking.transport) || { name: "", flushedCount: 0 },
+        config: cloneJsonSafe(tracking.config) || {},
+        lastStatement: summarizeStatement(tracking.lastStatement),
+        statements: Array.isArray(tracking.statements) ? tracking.statements.map(summarizeStatement).filter(Boolean) : [],
+        sendResults: Array.isArray(tracking.sendResults) ? tracking.sendResults.map(summarizeSendOutcome).filter(Boolean) : [],
+        pendingSendCount: Number.isFinite(tracking.pendingSendCount) ? tracking.pendingSendCount : 0,
+        lastSendOutcome: summarizeSendOutcome(tracking.lastSendOutcome),
+        lastFlushOutcome: summarizeSendOutcome(tracking.lastFlushOutcome)
+      };
+    }
+
+    function sanitizeBootState(boot) {
+      if (!boot || typeof boot !== "object") return null;
+      return {
+        desktopGate: cloneJsonSafe(boot.desktopGate) || { checked: false, allowed: true, reason: "" },
+        runtime: cloneJsonSafe(boot.runtime) || { bootstrapped: false, started: false, reviewMode: false },
+        tracking: sanitizeTrackingState(boot.tracking) || {
+          type: "scorm",
+          ready: false,
+          compatibilityAttached: false,
+          transport: { name: "", flushedCount: 0 },
+          config: {},
+          lastStatement: null,
+          statements: [],
+          sendResults: [],
+          pendingSendCount: 0,
+          lastSendOutcome: null,
+          lastFlushOutcome: null
+        },
+        state: cloneJsonSafe(boot.state) || { restored: false, summary: "" },
+        trackingConfig: cloneJsonSafe(boot.trackingConfig) || null
+      };
+    }
+
+    function sanitizeFrameSnapshot(frame) {
+      if (!frame || typeof frame !== "object") return null;
+      return {
+        title: frame.title || "",
+        url: frame.url || "",
+        ready: !!frame.ready,
+        textPreview: frame.textPreview || "",
+        controls: Array.isArray(frame.controls) ? cloneJsonSafe(frame.controls) || [] : [],
+        error: frame.error || null,
+        boot: sanitizeBootState(frame.boot)
+      };
+    }
+
+    async function postHarnessState() {
+      const session = window.__SCORM_TESTER_SESSION || {};
+
+      const frame = collectFrameSnapshot();
+      const frameBoot = frame && frame.boot ? frame.boot : null;
+      updateBootPanel(frameBoot);
+      const safeFrame = sanitizeFrameSnapshot(frame);
+      const safeBoot = sanitizeBootState(frameBoot);
+
+      await fetch("/api/harness/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          launchToken: activeFrameLaunchToken,
+          lmsConnected: !!window.API,
+          session,
+          boot: safeBoot || {
+            desktopGate: { checked: false, allowed: true, reason: "" },
+            runtime: { bootstrapped: false, started: false, reviewMode: false },
+            tracking: {
+              type:
+                currentMode === "standalone"
+                  ? "standalone"
+                  : "scorm",
+              ready: currentMode === "mobile-simulation" ? false : !!window.API,
+              compatibilityAttached: currentMode === "mobile-simulation" ? false : !!window.API,
+              transport: currentMode === "mobile-simulation"
+                ? null
+                : {
+                    name: "scorm-api-mock",
+                    flushedCount: 0
+                  },
+              lastStatement: null,
+              statements: []
+            },
+            state: {
+              restored: currentMode === "resume",
+              summary:
+                currentMode === "resume"
+                  ? "resume preset loaded"
+                  : currentMode === "mobile-simulation"
+                    ? "mobile simulation active"
+                    : ""
+            }
+          },
+          frame: safeFrame
+        })
+      });
+    }
+
+    function runBypassShortcut(frameDoc) {
+      const eventInit = buildKeyboardEventInit("ctrl+alt+k");
+      frameDoc.dispatchEvent(new KeyboardEvent("keydown", eventInit));
+      return {
+        key: eventInit.key || "",
+        code: eventInit.code || "",
+        ctrlKey: eventInit.ctrlKey,
+        altKey: eventInit.altKey,
+        shiftKey: eventInit.shiftKey,
+        metaKey: eventInit.metaKey
+      };
+    }
+
+    function clickFirstMatching(frameDoc, selectors) {
+      for (const selector of selectors) {
+        const element = frameDoc.querySelector(selector);
+        if (!element || element.disabled) continue;
+        element.click();
+        return {
+          selector,
+          text: (element.innerText || element.textContent || "").trim().slice(0, 120)
+        };
+      }
+      return null;
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function frameSignature(frame) {
+      if (!frame) return "";
+      const boot = frame.boot && frame.boot.runtime && frame.boot.runtime.state
+        ? frame.boot.runtime.state
+        : null;
+      return JSON.stringify({
+        url: frame.url || "",
+        title: frame.title || "",
+        ready: !!frame.ready,
+        textPreview: frame.textPreview || "",
+        bootSlide: boot && typeof boot.slide !== "undefined" ? boot.slide : null,
+        bootReviewMode: boot && typeof boot.reviewMode !== "undefined" ? !!boot.reviewMode : null
+      });
+    }
+
+    async function waitForFrameSettle(options = {}) {
+      const timeoutMs = Number.isFinite(options.timeoutMs) ? options.timeoutMs : 1200;
+      const intervalMs = Number.isFinite(options.intervalMs) ? options.intervalMs : 80;
+      const stableReadsRequired = Number.isFinite(options.stableReadsRequired) ? options.stableReadsRequired : 2;
+      const initialDelayMs = Number.isFinite(options.initialDelayMs) ? options.initialDelayMs : 120;
+      const start = Date.now();
+
+      if (initialDelayMs > 0) {
+        await wait(initialDelayMs);
+      }
+
+      let previousSignature = "";
+      let stableReads = 0;
+      let latestFrame = collectFrameSnapshot();
+
+      while ((Date.now() - start) < timeoutMs) {
+        latestFrame = collectFrameSnapshot();
+        const signature = frameSignature(latestFrame);
+
+        if (signature && signature === previousSignature) {
+          stableReads += 1;
+          if (stableReads >= stableReadsRequired) {
+            return latestFrame;
+          }
+        } else {
+          previousSignature = signature;
+          stableReads = 0;
+        }
+
+        await wait(intervalMs);
+      }
+
+      return latestFrame;
+    }
+
+    function isQuizLikeFrame(frame) {
+      const text = [frame.title || "", frame.textPreview || ""].join(" ").toLowerCase();
+      return /(quiz|question|results|certificate|course complete|final assessment|knowledge check)/i.test(text);
+    }
+
+    async function runAdminAdvance(frameDoc) {
+      const clicked = clickFirstMatching(frameDoc, [
+        "#btnNext",
+        "#continue-btn",
+        "#next-btn",
+        "#nextBtn",
+        "#btn-next",
+        "#btnContinue",
+        "#fbNext",
+        "#nextButton",
+        "#continueBtn",
+        ".view-cert-btn",
+        ".retry-btn",
+        ".begin-quiz-btn",
+        "button:not([disabled])"
+      ]);
+
+      if (clicked) {
+        await waitForFrameSettle({ timeoutMs: 900, initialDelayMs: 100, intervalMs: 70, stableReadsRequired: 1 });
+        return { advanced: true, ...clicked };
+      }
+
+      return { advanced: false, error: "No enabled advance button found" };
+    }
+
+    async function runAdminSkipQuiz(frameDoc) {
+      const steps = [];
+
+      for (let index = 0; index < 40; index += 1) {
+        const before = collectFrameSnapshot();
+        if (!isQuizLikeFrame(before)) {
+          break;
+        }
+
+        const bypass = runBypassShortcut(frameDoc);
+        await wait(80);
+        const advance = await runAdminAdvance(frameDoc);
+        const after = collectFrameSnapshot();
+
+        steps.push({ index: index + 1, before, bypass, advance, after });
+
+        if (!advance.advanced) {
+          break;
+        }
+
+        if (/course complete/i.test([after.title || "", after.textPreview || ""].join(" "))) {
+          break;
+        }
+      }
+
+      return {
+        steps,
+        finalFrame: collectFrameSnapshot()
+      };
+    }
+
+    async function executeCommand(command) {
+      const frameDoc = dom.frame.contentWindow && dom.frame.contentWindow.document;
+      if (!frameDoc || !frameDoc.body) {
+        return { ok: false, result: { error: "Frame document unavailable" } };
+      }
+
+      let result;
+      if (command.action === "click") {
+        const el = frameDoc.querySelector(command.selector);
+        if (!el) return { ok: false, result: { error: `No element for selector ${command.selector}` } };
+        el.click();
+        result = { clicked: command.selector, text: (el.innerText || "").trim().slice(0, 120) };
+      } else if (command.action === "type") {
+        const el = frameDoc.querySelector(command.selector);
+        if (!el) return { ok: false, result: { error: `No element for selector ${command.selector}` } };
+        el.focus();
+        el.value = command.text || "";
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+        result = { typedInto: command.selector, value: command.text || "" };
+      } else if (command.action === "keydown") {
+        const eventInit = buildKeyboardEventInit(command.key);
+        frameDoc.dispatchEvent(new KeyboardEvent("keydown", eventInit));
+        result = {
+          key: eventInit.key || "",
+          code: eventInit.code || "",
+          ctrlKey: eventInit.ctrlKey,
+          altKey: eventInit.altKey,
+          shiftKey: eventInit.shiftKey,
+          metaKey: eventInit.metaKey
+        };
+      } else if (command.action === "adminBypass") {
+        result = runBypassShortcut(frameDoc);
+      } else if (command.action === "adminAdvance") {
+        result = await runAdminAdvance(frameDoc);
+      } else if (command.action === "adminSkipQuiz") {
+        result = await runAdminSkipQuiz(frameDoc);
+      } else if (command.action === "snapshot") {
+        result = await waitForFrameSettle({ timeoutMs: 700, initialDelayMs: 40, intervalMs: 60, stableReadsRequired: 1 });
+      } else {
+        return { ok: false, result: { error: `Unsupported action ${command.action}` } };
+      }
+
+      if (command.action !== "snapshot") {
+        result.frame = await waitForFrameSettle({
+          timeoutMs: command.action === "keydown" ? 1000 : 1200,
+          initialDelayMs: command.action === "type" ? 80 : 120,
+          intervalMs: 80,
+          stableReadsRequired: 2
+        });
+        if (result.frame && result.frame.boot) {
+          updateBootPanel(result.frame.boot);
+        }
+      }
+
+      return { ok: true, result };
+    }
+
+    async function processServerState() {
+      const res = await fetch("/api/harness/poll");
+      const data = await res.json();
+
+      const desiredLaunch = data.desiredLaunch || null;
+      const desiredLaunchToken = desiredLaunch ? String(desiredLaunch.token) : "";
+      const currentFrameUrl = dom.frame.contentWindow && dom.frame.contentWindow.location
+        ? dom.frame.contentWindow.location.href || ""
+        : "";
+      const frameLaunchMatches = desiredLaunchToken && currentFrameUrl.includes(`launchKey=${desiredLaunchToken}`);
+      if (desiredLaunch && !frameLaunchMatches) {
+        currentMode = data.desiredLaunch.mode;
+        renderModes();
+        dom.courseSelect.value = data.desiredLaunch.launchPath;
+        const desiredCourse = courses.find((course) => course.launchPath === data.desiredLaunch.launchPath) || {
+          id: data.desiredLaunch.courseId,
+          label: data.desiredLaunch.courseId,
+          launchPath: data.desiredLaunch.launchPath
+        };
+        launchCourse({
+          launchKey: desiredLaunchToken,
+          preset: data.desiredLaunch.preset,
+          course: desiredCourse
+        });
+        lastLaunchToken = data.desiredLaunch.token;
+        await fetch("/api/harness/launch-complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: data.desiredLaunch.token })
+        });
+      }
+
+      for (const command of (data.pendingCommands || [])) {
+        const outcome = await executeCommand(command);
+        await fetch("/api/commands/result", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: command.id,
+            ok: outcome.ok,
+            result: outcome.result
+          })
+        });
+      }
+
+      const statusRes = await fetch("/api/status");
+      const status = await statusRes.json();
+      updateTelemetryBatchPanel(status.telemetry || null);
+
+      await postHarnessState();
+    }
+
+    dom.courseSelect.addEventListener("change", () => {
+      const course = selectedCourse();
+      if (!course) return;
+      dom.launchTitle.textContent = course.label;
+      dom.launchPath.textContent = `/course/${course.launchPath}`;
+      updateImportActions();
+    });
+    document.addEventListener("keydown", relayPhysicalBypassShortcut, true);
+    window.addEventListener("keydown", relayPhysicalBypassShortcut, true);
+
+    dom.launchBtn.addEventListener("click", async () => {
+      try {
+        await requestLaunchFromServer();
+      } catch (err) {
+        logLine(err.message);
+        alert(err.message);
+      }
+    });
+
+    dom.resetBtn.addEventListener("click", async () => {
+      dom.log.textContent = "";
+      dom.telemetryBatchLog.textContent = "";
+      updateStatePanel(null, false);
+      updateBootPanel(null);
+      logLine("Log reset.");
+      await fetch("/api/log/reset", { method: "POST" });
+    });
+
+    dom.importZipBtn.addEventListener("click", () => {
+      dom.zipInput.click();
+    });
+
+    dom.zipInput.addEventListener("change", async () => {
+      const file = dom.zipInput.files && dom.zipInput.files[0] ? dom.zipInput.files[0] : null;
+      if (!file) return;
+
+      try {
+        logLine(`Importing ${file.name}...`);
+        const res = await fetch("/api/import/zip", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/zip",
+            "X-File-Name": encodeURIComponent(file.name)
+          },
+          body: file
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Zip import failed");
+        await loadCourses();
+        const imported = courses.find((course) => course.id === data.courseId);
+        if (imported) {
+          dom.courseSelect.value = imported.launchPath;
+          dom.launchTitle.textContent = imported.label;
+          dom.launchPath.textContent = `/course/${imported.launchPath}`;
+        }
+        updateImportActions();
+        logLine(data.duplicate ? `Already imported: ${file.name}` : `Imported ${file.name}`);
+      } catch (err) {
+        logLine(`Import failed: ${err.message}`);
+        alert(err.message);
+      } finally {
+        dom.zipInput.value = "";
+      }
+    });
+
+    dom.removeImportBtn.addEventListener("click", async () => {
+      const course = selectedCourse();
+      if (!course || course.source !== "import") return;
+      if (!window.confirm(`Remove imported package "${course.label}" from this tester?`)) return;
+
+      try {
+        const res = await fetch("/api/import/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courseId: course.id })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Remove import failed");
+        await loadCourses();
+        logLine(`Removed imported package: ${course.label}`);
+      } catch (err) {
+        logLine(`Remove failed: ${err.message}`);
+        alert(err.message);
+      }
+    });
+
+    async function exportJson(endpoint, label) {
+      try {
+        const res = await fetch(endpoint, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `${label} export failed`);
+        logLine(`${label} exported to ${data.filePath}`);
+        alert(`${label} exported locally:\n${data.filePath}`);
+      } catch (err) {
+        logLine(`${label} export failed: ${err.message}`);
+        alert(err.message);
+      }
+    }
+
+    dom.reportBtn.addEventListener("click", () => {
+      exportJson("/api/export/tester-report", "Tester Report");
+    });
+
+    dom.diagnosticsBtn.addEventListener("click", () => {
+      exportJson("/api/export/diagnostics", "Diagnostics");
+    });
+
+    renderModes();
+    updateBootPanel(null);
+    dom.frame.addEventListener("load", () => {
+      const frameUrl = dom.frame.contentWindow && dom.frame.contentWindow.location
+        ? dom.frame.contentWindow.location.href || ""
+        : "";
+      if (frameUrl === "about:blank") return;
+      postHarnessState().catch((err) => {
+        logLine(`Frame sync error: ${err.message}`);
+      });
+    });
+    loadCourses().catch((err) => {
+      logLine(`Failed to load courses: ${err.message}`);
+    });
+
+    syncTimer = window.setInterval(() => {
+      processServerState().catch((err) => {
+        logLine(`Sync error: ${err.message}`);
+      });
+    }, 700);
+  </script>
+</body>
+</html>

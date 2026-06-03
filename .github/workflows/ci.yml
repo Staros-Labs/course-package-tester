@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  package-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run package:windows:zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoursePackageTester-Windows-x64
+          path: |
+            dist/desktop/CoursePackageTester_Windows_x64_v*.zip
+            dist/desktop/CoursePackageTester_Windows_x64_v*.zip.sha256.txt
