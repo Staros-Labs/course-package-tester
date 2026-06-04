@@ -8,4 +8,22 @@ The public repository is the canonical product surface. Legacy embedded copies i
 
 v1.1.0 is the current unsigned minor release. It adds first-run guidance, recent package shortcuts, clearer zip import failure suggestions, and a Feedback Summary export for external review cycles.
 
+Release:
+
+```text
+https://github.com/Staros-Labs/course-package-tester/releases/tag/v1.1.0
+```
+
+Windows artifact:
+
+```text
+CoursePackageTester_Windows_x64_v1.1.0.zip
+```
+
+SHA256:
+
+```text
+9aa94de18d1ab3c3cf139f633fbbeda0a1c789b0af506fe5c143265705399791
+```
+
 Windows code signing remains deferred until a certificate or signing provider is available. Release notes and handoff materials must continue to call out unsigned status while that remains true.

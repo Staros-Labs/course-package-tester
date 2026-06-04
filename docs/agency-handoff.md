@@ -10,6 +10,12 @@ Download the latest Windows release from:
 https://github.com/Staros-Labs/course-package-tester/releases/latest
 ```
 
+Current reviewed release:
+
+```text
+https://github.com/Staros-Labs/course-package-tester/releases/tag/v1.1.0
+```
+
 ## Suggested Email
 
 ```text
@@ -18,9 +24,13 @@ Hi,
 We published Course Package Tester as a public Staros Labs utility for local course-package preflight testing.
 
 Download:
-https://github.com/Staros-Labs/course-package-tester/releases/latest
+https://github.com/Staros-Labs/course-package-tester/releases/tag/v1.1.0
 
-Use the Windows x64 zip asset. After downloading, compare the zip against the published SHA256 checksum on the release page.
+Use the Windows x64 zip asset:
+CoursePackageTester_Windows_x64_v1.1.0.zip
+
+After downloading, compare the zip against this published SHA256 checksum:
+9aa94de18d1ab3c3cf139f633fbbeda0a1c789b0af506fe5c143265705399791
 
 Current signature status:
 The v1.1.0 release is unsigned. Windows may show a publisher or SmartScreen warning. Signed releases are deferred until a code-signing certificate is available.

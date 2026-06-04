@@ -16,3 +16,5 @@
 14. Export diagnostics.
 15. Export a Feedback Summary.
 16. Create the GitHub Release with zip and checksum attached.
+17. Confirm the release asset digest matches the published SHA256 checksum.
+18. Confirm GitHub Actions CI passes on the release tag.

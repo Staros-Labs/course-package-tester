@@ -63,6 +63,12 @@ Latest release:
 https://github.com/Staros-Labs/course-package-tester/releases/latest
 ```
 
+Current release:
+
+```text
+https://github.com/Staros-Labs/course-package-tester/releases/tag/v1.1.0
+```
+
 ```bash
 npm run package:windows:zip
 ```
@@ -74,6 +80,12 @@ dist/desktop/CoursePackageTester_Windows_x64_v1.1.0.zip
 ```
 
 A SHA256 checksum is written next to the zip.
+
+Current v1.1.0 SHA256:
+
+```text
+9aa94de18d1ab3c3cf139f633fbbeda0a1c789b0af506fe5c143265705399791
+```
 
 ## Signing
 

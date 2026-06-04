@@ -19,6 +19,24 @@ Expected tester traffic is limited to loopback URLs.
 
 The current v1.1.0 release is unsigned. Unsigned builds will show as unsigned in Windows and may trigger SmartScreen or publisher trust warnings.
 
+Current release:
+
+```text
+https://github.com/Staros-Labs/course-package-tester/releases/tag/v1.1.0
+```
+
+Current Windows artifact:
+
+```text
+CoursePackageTester_Windows_x64_v1.1.0.zip
+```
+
+Current SHA256:
+
+```text
+9aa94de18d1ab3c3cf139f633fbbeda0a1c789b0af506fe5c143265705399791
+```
+
 Signed builds should be verified with:
 
 ```powershell
