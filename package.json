@@ -20,11 +20,11 @@
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.9.10",
-    "yauzl": "^3.2.0"
+    "yauzl": "^3.4.0"
   },
   "devDependencies": {
-    "@electron/packager": "^20.0.0",
-    "@electron/windows-sign": "^2.0.3",
+    "@electron/packager": "^20.0.2",
+    "@electron/windows-sign": "^2.0.6",
     "electron": "^42.3.3",
     "yazl": "^3.3.1"
   }
