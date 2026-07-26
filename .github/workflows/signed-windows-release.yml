@@ -41,7 +41,7 @@ jobs:
       - run: npm run sign:windows
       - run: powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-signature.ps1 -RequireValid
       - run: npm run package:windows:zip:existing
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: CoursePackageTester-Windows-x64-signed
           path: |
