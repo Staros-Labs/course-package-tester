@@ -19,11 +19,11 @@
     "package:windows:zip": "npm run package:windows && npm run package:windows:zip:existing"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.9.10",
+    "@xmldom/xmldom": "^0.9.11",
     "yauzl": "^3.4.0"
   },
   "devDependencies": {
-    "@electron/packager": "^20.0.2",
+    "@electron/packager": "^20.3.0",
     "@electron/windows-sign": "^2.0.6",
     "electron": "^42.3.3",
     "yazl": "^3.3.1"
