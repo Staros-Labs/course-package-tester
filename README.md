@@ -91,7 +91,7 @@ Current v1.1.0 SHA256:
 
 Windows code signing is supported but requires a Staros Labs Authenticode certificate. The current v1.1.0 release is unsigned, and release notes state that status.
 
-See [Windows Code Signing](./docs/code-signing.md) for GitHub Actions secrets, local signing commands, and release-note requirements.
+See [Windows Code Signing](./docs/code-signing.md) for local signing commands and release-note requirements.
 
 On Windows:
 
